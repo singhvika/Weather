@@ -66,6 +66,50 @@ var getAddressAndCoords = (address, apikey, callback) =>{
 
 }
 
+
+const getWeather = (address, apikey, weatherCallback) => {
+
+
+getAddressAndCoords(address, apikey, (error, addressObj) => {
+    if(error)
+    {
+        weatherCallback(error);
+    }
+    else{
+
+        request({
+            url: `https://api.darksky.net/forecast/6057f5be41d3ec636e0dd7472761a85e/${addressObj.lat},${addressObj.lng}`,
+            json: true
+        }, (error, response, body) => {
+            if (!error && response.statusCode===200)
+            {
+                weatherCallback(undefined, {
+                    addrObj : {
+                        formatted_address: addressObj.formatted_address,
+                        lng: addressObj.lng,
+                        lat: addressObj.lat
+                    },
+                    temperature: body.currently.temperature,
+                    feelslike: body.currently.apparentTemperature
+                })    
+            }
+            else
+            {
+                weatherCallback(JSON.stringify(error, undefined, 1));
+            }
+        })
+
+        
+    }
+
+})
+
+
+    
+
+}
+
 module.exports = {
-    getAddressAndCoords
+    getAddressAndCoords,
+    getWeather
 }
