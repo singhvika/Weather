@@ -4,6 +4,7 @@
   "description": "weather app with google apis",
   "main": "app.js",
   "dependencies": {
+    "axios": "^0.18.0",
     "npm": "^6.1.0",
     "request": "^2.87.0",
     "yargs": "^11.0.0"

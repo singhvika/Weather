@@ -1,5 +1,5 @@
 const request =  require('request');
-
+const axios = require('axios');
 
 
 
@@ -103,13 +103,59 @@ getAddressAndCoords(address, apikey, (error, addressObj) => {
     }
 
 })
+}
 
+
+
+const getWeatherWithPromise = (address, apikey) => {
 
     
+    const encodedAddress = encodeURIComponent(address);
+    let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}`;
 
+if (apikey){
+    console.log(`request will be made with the provided google api key`);
+    url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apikey}`;
+    
 }
+else{
+    console.log(`request will be made without google api-key. not guaranteed to work`);
+}
+
+axios.get(url)
+    .then((response)=> {
+
+    if (response.data.status === 'OK')
+    {   console.log(`Address: ${response.data.results[0].geometry.location.lat}`);
+         let lat= response.data.results[0].geometry.location.lat;
+         let lng= response.data.results[0].geometry.location.lat;
+         return axios.get(`https://api.darksky.net/forecast/6057f5be41d3ec636e0dd7472761a85e/${lat},${lng}`);
+        
+    }
+    else
+    {
+        throw new Error(`Cannot connect to Google API for address information`)
+    }
+    
+})
+.then(
+    (forecast)=> {
+    console.log(`Temperature: ${forecast.data.currently.temperature}`);
+    console.log(`Feels Like: ${forecast.data.currently.apparentTemperature}`);
+},
+    (error) => {
+        throw new Error(error);
+    })
+.catch((err) => {
+    console.log(`ERROR: ${err}`);
+})
+}
+    
+
+
 
 module.exports = {
     getAddressAndCoords,
-    getWeather
+    getWeather,
+    getWeatherWithPromise
 }
